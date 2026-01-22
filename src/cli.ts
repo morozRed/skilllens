@@ -23,7 +23,7 @@ function main(argv = process.argv.slice(2)) {
   const program = new Command();
 
   program
-    .name("skillguard")
+    .name("skilllens")
     .description("Scan local agent skills/tools and show findings.")
     .version(pkg.version)
     .addHelpText("before", `${bannerText()}\n`);

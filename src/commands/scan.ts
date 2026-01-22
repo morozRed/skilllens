@@ -44,6 +44,8 @@ type AuditIssue = {
 };
 
 type AuditDetails = {
+  verdict?: string;
+  risk?: number;
   summary?: string;
   issues: AuditIssue[];
 };
@@ -147,7 +149,7 @@ function buildPrompt(skill: DiscoveredSkill, content: string, truncated: boolean
 }
 
 function startSpinner(message: string) {
-  const frames = ["|", "/", "-", "\\"];
+  const frames = [".  ", ".. ", "...", " ..", "  ."];
   let index = 0;
   process.stdout.write(`${frames[index]} ${message}`);
   const interval = setInterval(() => {
@@ -166,6 +168,27 @@ function formatTimestamp(date: Date | null) {
     return "unknown";
   }
   return date.toISOString();
+}
+
+function verdictAction(verdict?: string) {
+  if (verdict === "unsafe") {
+    return "Do not install";
+  }
+  if (verdict === "suspicious") {
+    return "Review before install";
+  }
+  if (verdict === "safe") {
+    return "OK to install";
+  }
+  return "Review";
+}
+
+function formatSeverity(severity?: string, verdict?: string) {
+  const normalized = severity ? severity.toUpperCase() : "MEDIUM";
+  if (normalized === "HIGH" && verdict === "unsafe") {
+    return "CRITICAL";
+  }
+  return normalized;
 }
 
 function hashSkillAudit(content: string, auditor: string) {
@@ -206,8 +229,9 @@ async function ensureUserConfig(options: ScanOptions, auditorStatus: ReturnType<
 }
 
 async function runScan(scanPath?: string, options: ScanOptions = {}) {
+  const startedAt = Date.now();
   banner();
-  heading("SkillGuard Scan");
+  heading("SkillLens Scan");
 
   const root = path.resolve(scanPath || process.cwd());
   if (!(await dirExists(root))) {
@@ -276,7 +300,7 @@ async function runScan(scanPath?: string, options: ScanOptions = {}) {
   const resolvedRoots = pruneNestedRoots(normalizeRoots(scanRoots));
   const { skills, missingRoots } = await discoverSkills(resolvedRoots, {
     maxDepth: 6,
-    ignoreDirs: [".git", "node_modules", ".skillguard"]
+    ignoreDirs: [".git", "node_modules", ".skilllens"]
   });
 
   const missingSet = new Set(missingRoots);
@@ -329,6 +353,8 @@ async function runScan(scanPath?: string, options: ScanOptions = {}) {
           auditResults.set(skill.path, `audited (cached ${cachedEntry.verdict})`);
           if (cachedEntry.verdict !== "safe") {
             auditDetails.set(skill.path, {
+              verdict: cachedEntry.verdict,
+              risk: typeof cachedEntry.risk === "number" ? cachedEntry.risk : undefined,
               summary: cachedEntry.summary,
               issues: Array.isArray(cachedEntry.issues) ? cachedEntry.issues : []
             });
@@ -353,6 +379,8 @@ async function runScan(scanPath?: string, options: ScanOptions = {}) {
           auditResults.set(skill.path, `audited (${result.parsed.verdict})`);
           if (result.parsed.verdict !== "safe") {
             auditDetails.set(skill.path, {
+              verdict: result.parsed.verdict,
+              risk: typeof result.parsed.risk === "number" ? result.parsed.risk : undefined,
               summary: result.parsed.summary,
               issues: Array.isArray(result.parsed.issues) ? result.parsed.issues : []
             });
@@ -363,6 +391,7 @@ async function runScan(scanPath?: string, options: ScanOptions = {}) {
               verdict: result.parsed.verdict,
               summary: result.parsed.summary,
               issues: Array.isArray(result.parsed.issues) ? result.parsed.issues : [],
+              risk: typeof result.parsed.risk === "number" ? result.parsed.risk : undefined,
               auditedAt: new Date().toISOString()
             };
           }
@@ -393,6 +422,8 @@ async function runScan(scanPath?: string, options: ScanOptions = {}) {
   } else {
     info(`Skill audit: ${auditMessage}.`);
   }
+  const elapsedMs = Date.now() - startedAt;
+  success(`Scan complete in ${elapsedMs}ms`);
   info("Skills by source:");
   const groups = groupSkills(skills);
   const orderedLabels = ["Claude", "Codex (system)", "Codex", "OpenCode", "Other"];
@@ -425,9 +456,16 @@ async function runScan(scanPath?: string, options: ScanOptions = {}) {
           if (details.issues && details.issues.length) {
             details.issues.forEach((issue) => {
               const title = issue && issue.title ? issue.title : "Issue";
-              const severity = issue && issue.severity ? issue.severity : "unknown";
-              dim(`    issue: [${severity}] ${title}`);
+              const severity = formatSeverity(issue && issue.severity, details.verdict);
+              console.log(`    ${severity} ${title}`);
+              if (issue && issue.evidence) {
+                console.log(`    └─ ${issue.evidence}`);
+              }
             });
+          }
+          if (typeof details.risk === "number") {
+            const score = Math.round(details.risk * 10);
+            console.log(`    Risk Score: ${score}/100 — ${verdictAction(details.verdict)}`);
           }
         }
       });

@@ -1,12 +1,12 @@
-# PRD Update: SkillGuard — Scan-led setup (no `init`)
+# PRD Update: SkillLens — Scan-led setup (no `init`)
 
 ## 1) Summary
 
-**SkillGuard** is a developer CLI that scans locally installed agent “skills/tools”, extracts redacted security evidence, sends it to an online auditor (**Claude**, **Codex**, or **OpenCode**) via their CLI for classification, and outputs a human-friendly overview. The primary workflow is `skillguard scan`, which also handles first-time config creation.
+**SkillLens** is a developer CLI that scans locally installed agent “skills/tools”, extracts redacted security evidence, sends it to an online auditor (**Claude**, **Codex**, or **OpenCode**) via their CLI for classification, and outputs a human-friendly overview. The primary workflow is `skilllens scan`, which also handles first-time config creation.
 
 ## 2) Key UX principle
 
-**One command to start:** `skillguard scan`
+**One command to start:** `skilllens scan`
 If this is the first run, `scan` automatically creates config and then runs.
 
 ---
@@ -15,7 +15,7 @@ If this is the first run, `scan` automatically creates config and then runs.
 
 ### Core
 
-* `skillguard scan [path]`
+* `skilllens scan [path]`
 
   * First-time run:
 
@@ -29,9 +29,9 @@ If this is the first run, `scan` automatically creates config and then runs.
 
 ### Configuration utility
 
-* `skillguard config`
+* `skilllens config`
 
-> Removal: `skillguard init` does not exist.
+> Removal: `skilllens init` does not exist.
 
 ---
 
@@ -39,7 +39,7 @@ If this is the first run, `scan` automatically creates config and then runs.
 
 ### 4.1 When setup triggers
 
-On `skillguard scan`:
+On `skilllens scan`:
 
 * If **no user config**:
 
@@ -49,11 +49,11 @@ On `skillguard scan`:
 
 Create:
 
-1. **User config** at `~/.skillguard/config.json` (global defaults)
+1. **User config** at `~/.skilllens/config.json` (global defaults)
 
 ### 4.3 Setup content
 
-Default `~/.skillguard/config.json` should include:
+Default `~/.skilllens/config.json` should include:
 
 * `auditor` default: `"claude"` (or your preference)
 * `scan.autoRoots` seeded with common skill locations (e.g., `~/.claude/skills`, `~/.opencode/skills`, `~/.codex/skills`, plus XDG locations)
@@ -98,7 +98,7 @@ CLI flags > user config > defaults
 
 ### Paths
 
-* User: `~/.skillguard/config.json`
+* User: `~/.skilllens/config.json`
 Only global config is supported in v1.
 
 ---
@@ -120,8 +120,8 @@ Do it this way. It reduces cognitive load:
 If you want one extra polish: after setup, print a **single copy-pastable command**:
 
 * `claude login` (or whichever auditor)
-* then: `skillguard scan`
+* then: `skilllens scan`
 
-And optionally mention `skillguard config show` for debugging.
+And optionally mention `skilllens config show` for debugging.
 
 If you want, I can now produce the **final PRD text** as a single clean document (not a diff) with `init` removed and onboarding behavior fully specified.

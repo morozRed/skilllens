@@ -2,19 +2,9 @@ import chalk from "chalk";
 
 function bannerText() {
   return [
-    "███████╗██╗  ██╗██╗██╗     ██╗     ",
-    "██╔════╝██║ ██╔╝██║██║     ██║     ",
-    "███████╗█████╔╝ ██║██║     ██║     ",
-    "╚════██║██╔═██╗ ██║██║     ██║     ",
-    "███████║██║  ██╗██║███████╗███████╗",
-    "╚══════╝╚═╝  ╚═╝╚═╝╚══════╝╚══════╝",
-    "",
-    " ██████╗ ██╗   ██╗ █████╗ ██████╗ ██████╗ ",
-    "██╔════╝ ██║   ██║██╔══██╗██╔══██╗██╔══██╗",
-    "██║  ███╗██║   ██║███████║██████╔╝██║  ██║",
-    "██║   ██║██║   ██║██╔══██║██╔══██╗██║  ██║",
-    "╚██████╔╝╚██████╔╝██║  ██║██║  ██║██████╔╝",
-    " ╚═════╝  ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═════╝ "
+    "SKILLLENS",
+    "---------",
+    ""
   ].join("\n");
 }
 
@@ -22,18 +12,8 @@ function banner() {
   const lines = bannerText().split("\n");
   const colors = [
     chalk.bold.white,
-    chalk.bold.cyanBright,
-    chalk.cyanBright,
-    chalk.cyan,
-    chalk.blue,
-    chalk.dim.blue,
-    null, // empty line
-    chalk.bold.white,
-    chalk.bold.cyanBright,
-    chalk.cyanBright,
-    chalk.cyan,
-    chalk.blue,
-    chalk.dim.blue
+    chalk.dim.cyan,
+    null
   ];
 
   console.log("");

@@ -8,6 +8,7 @@ const CACHE_VERSION = 1;
 type CacheEntry = {
   hash: string;
   verdict: string;
+  risk?: number;
   summary?: string;
   issues?: { title?: string; severity?: string; evidence?: string }[];
   auditedAt?: string;

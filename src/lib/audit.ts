@@ -45,7 +45,7 @@ async function ensureSchemaFile() {
   if (schemaFilePath) {
     return schemaFilePath;
   }
-  const filePath = path.join(os.tmpdir(), "skillguard-audit-schema.json");
+  const filePath = path.join(os.tmpdir(), "skilllens-audit-schema.json");
   await fs.writeFile(filePath, JSON.stringify(AUDIT_SCHEMA, null, 2), "utf8");
   schemaFilePath = filePath;
   return filePath;

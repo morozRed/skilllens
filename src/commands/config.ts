@@ -5,7 +5,7 @@ import { userConfigPath } from "../lib/paths.js";
 
 async function runConfigShow() {
   banner();
-  heading("SkillGuard Config");
+  heading("SkillLens Config");
 
   const config = await loadMergedConfig();
   info(`Config path: ${userConfigPath()}`);

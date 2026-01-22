@@ -6,4 +6,5 @@ yarn-error.log*
 pnpm-debug.log*
 bun-error.log*
 .env
+.skilllens/
 .skillguard/

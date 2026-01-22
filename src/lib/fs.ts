@@ -1,5 +1,5 @@
-const fs = require("fs/promises");
-const path = require("path");
+import * as fs from "node:fs/promises";
+import * as path from "node:path";
 
 async function fileExists(filePath) {
   try {
@@ -43,7 +43,7 @@ async function writeJson(filePath, value) {
   await fs.writeFile(filePath, data, "utf8");
 }
 
-module.exports = {
+export {
   fileExists,
   dirExists,
   ensureDir,

@@ -1,5 +1,5 @@
-const fs = require("fs");
-const path = require("path");
+import * as fs from "node:fs";
+import * as path from "node:path";
 
 function hasPathSeparator(command) {
   return command.includes(path.sep) || (path.sep === "\\" && command.includes("/"));
@@ -67,6 +67,6 @@ function findExecutable(command) {
   return null;
 }
 
-module.exports = {
+export {
   findExecutable
 };

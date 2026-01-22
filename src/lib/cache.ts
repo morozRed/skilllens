@@ -1,10 +1,24 @@
-const fs = require("fs/promises");
-const { fileExists } = require("./fs");
-const { cachePath } = require("./paths");
+import * as fs from "node:fs/promises";
+import * as path from "node:path";
+import { fileExists } from "./fs.js";
+import { cachePath } from "./paths.js";
 
 const CACHE_VERSION = 1;
 
-async function readCache() {
+type CacheEntry = {
+  hash: string;
+  verdict: string;
+  summary?: string;
+  issues?: { title?: string; severity?: string; evidence?: string }[];
+  auditedAt?: string;
+};
+
+type CacheState = {
+  version: number;
+  entries: Record<string, CacheEntry>;
+};
+
+async function readCache(): Promise<CacheState> {
   const filePath = cachePath();
   if (!(await fileExists(filePath))) {
     return { version: CACHE_VERSION, entries: {} };
@@ -24,10 +38,10 @@ async function readCache() {
   }
 }
 
-async function writeCache(cache) {
+async function writeCache(cache: CacheState) {
   const filePath = cachePath();
   const payload = JSON.stringify(cache, null, 2) + "\n";
-  await fs.mkdir(require("path").dirname(filePath), { recursive: true });
+  await fs.mkdir(path.dirname(filePath), { recursive: true });
   await fs.writeFile(filePath, payload, "utf8");
 }
 
@@ -35,9 +49,11 @@ function cacheKeyForSkill(skillPath) {
   return skillPath;
 }
 
-module.exports = {
+export {
   CACHE_VERSION,
   readCache,
   writeCache,
-  cacheKeyForSkill
+  cacheKeyForSkill,
+  type CacheEntry,
+  type CacheState
 };

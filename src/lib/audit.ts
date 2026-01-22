@@ -1,7 +1,7 @@
-const { spawn } = require("child_process");
-const fs = require("fs/promises");
-const os = require("os");
-const path = require("path");
+import { spawn } from "node:child_process";
+import * as fs from "node:fs/promises";
+import * as os from "node:os";
+import * as path from "node:path";
 
 const AUDIT_SCHEMA = {
   type: "object",
@@ -51,7 +51,7 @@ async function ensureSchemaFile() {
   return filePath;
 }
 
-async function argsForAuditor(auditor, prompt) {
+async function argsForAuditor(auditor: string, prompt: string) {
   if (auditor === "codex") {
     const schemaPath = await ensureSchemaFile();
     return ["exec", prompt, "--skip-git-repo-check", "--output-schema", schemaPath];
@@ -63,16 +63,17 @@ async function argsForAuditor(auditor, prompt) {
   throw new Error(`Unsupported auditor: ${auditor}`);
 }
 
-function normalizeParsed(rawParsed) {
+function normalizeParsed(rawParsed: unknown) {
   if (rawParsed && typeof rawParsed === "object") {
-    if (rawParsed.structured_output && typeof rawParsed.structured_output === "object") {
-      return rawParsed.structured_output;
+    const obj = rawParsed as { structured_output?: unknown };
+    if (obj.structured_output && typeof obj.structured_output === "object") {
+      return obj.structured_output;
     }
   }
   return rawParsed;
 }
 
-function parseAuditorOutput(stdout) {
+function parseAuditorOutput(stdout: string) {
   const text = stdout.trim();
   if (!text) {
     return { parsed: null, rawParsed: null };
@@ -108,7 +109,20 @@ function parseAuditorOutput(stdout) {
   return { parsed: normalizeParsed(rawParsed), rawParsed };
 }
 
-function runAuditor(auditor, prompt, options = {}) {
+type AuditorResult = {
+  ok: boolean;
+  exitCode: number | null;
+  stdout: string;
+  stderr: string;
+  parsed: any;
+};
+
+type AuditorRunOptions = {
+  onStdout?: (text: string) => void;
+  onStderr?: (text: string) => void;
+};
+
+function runAuditor(auditor: string, prompt: string, options: AuditorRunOptions = {}): Promise<AuditorResult> {
   return new Promise((resolve) => {
     let stdout = "";
     let stderr = "";
@@ -122,7 +136,7 @@ function runAuditor(auditor, prompt, options = {}) {
       try {
         args = await argsForAuditor(auditor, prompt);
       } catch (err) {
-        resolve({ ok: false, exitCode: 2, stdout: "", stderr: err.message });
+        resolve({ ok: false, exitCode: 2, stdout: "", stderr: err.message, parsed: null });
         return;
       }
 
@@ -167,12 +181,12 @@ function runAuditor(auditor, prompt, options = {}) {
           return;
         }
         settled = true;
-        resolve({ ok: false, exitCode, stdout, stderr: err.message });
+        resolve({ ok: false, exitCode, stdout, stderr: err.message, parsed: null });
       });
     })();
   });
 }
 
-module.exports = {
+export {
   runAuditor
 };

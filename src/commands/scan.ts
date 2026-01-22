@@ -1,7 +1,8 @@
-const path = require("path");
-const os = require("os");
-const fs = require("fs/promises");
-const {
+import * as path from "node:path";
+import * as os from "node:os";
+import * as fs from "node:fs/promises";
+import * as crypto from "node:crypto";
+import {
   banner,
   heading,
   info,
@@ -10,28 +11,44 @@ const {
   warn,
   error,
   dim
-} = require("../lib/ui");
-const { dirExists } = require("../lib/fs");
-const { userConfigPath } = require("../lib/paths");
-const { readCache, writeCache, cacheKeyForSkill } = require("../lib/cache");
-const crypto = require("crypto");
-const {
+} from "../lib/ui.js";
+import { dirExists } from "../lib/fs.js";
+import { userConfigPath } from "../lib/paths.js";
+import { readCache, writeCache, cacheKeyForSkill, type CacheState } from "../lib/cache.js";
+import {
   auditorCliCommand,
   normalizeAuditor,
   defaultConfig,
   loadMergedConfig,
   userConfigExists,
   writeUserConfig
-} = require("../lib/config");
-const {
+} from "../lib/config.js";
+import {
   resolveAuditorCli,
   listAuditorStatus,
   pickDefaultAuditor
-} = require("../lib/auditor");
-const { discoverSkills } = require("../lib/skills");
-const { runAuditor } = require("../lib/audit");
+} from "../lib/auditor.js";
+import { discoverSkills, type DiscoveredSkill } from "../lib/skills.js";
+import { runAuditor } from "../lib/audit.js";
 
-function expandHome(input) {
+type ScanOptions = {
+  auditor?: string;
+  verbose?: boolean;
+  force?: boolean;
+};
+
+type AuditIssue = {
+  title?: string;
+  severity?: string;
+  evidence?: string;
+};
+
+type AuditDetails = {
+  summary?: string;
+  issues: AuditIssue[];
+};
+
+function expandHome(input?: string) {
   if (!input) {
     return input;
   }
@@ -44,16 +61,16 @@ function expandHome(input) {
   return input;
 }
 
-function normalizeRoots(roots) {
+function normalizeRoots(roots: string[]) {
   return roots.map((root) => path.resolve(expandHome(root)));
 }
 
-function pruneNestedRoots(roots) {
+function pruneNestedRoots(roots: string[]) {
   const unique = Array.from(new Set(roots));
   const sorted = unique.slice().sort((a, b) => a.length - b.length);
   const kept = [];
 
-  sorted.forEach((candidate) => {
+  sorted.forEach((candidate: string) => {
     const isNested = kept.some((root) => candidate === root || candidate.startsWith(root + path.sep));
     if (!isNested) {
       kept.push(candidate);
@@ -63,7 +80,7 @@ function pruneNestedRoots(roots) {
   return kept;
 }
 
-function providerLabel(skill) {
+function providerLabel(skill: DiscoveredSkill) {
   const normalizedPath = skill.path.split(path.sep).join("/");
   const normalizedRoot = (skill.root || skill.path).split(path.sep).join("/");
   if (normalizedPath.match(/\/\.?codex\/skills\/\.system\b/)) {
@@ -81,8 +98,8 @@ function providerLabel(skill) {
   return "Other";
 }
 
-function groupSkills(skills) {
-  const groups = new Map();
+function groupSkills(skills: DiscoveredSkill[]) {
+  const groups = new Map<string, DiscoveredSkill[]>();
   for (const skill of skills) {
     const label = providerLabel(skill);
     if (!groups.has(label)) {
@@ -93,7 +110,7 @@ function groupSkills(skills) {
   return groups;
 }
 
-function truncateContent(content, maxLength) {
+function truncateContent(content: string, maxLength: number) {
   if (content.length <= maxLength) {
     return { content, truncated: false };
   }
@@ -103,7 +120,7 @@ function truncateContent(content, maxLength) {
   };
 }
 
-function buildPrompt(skill, content, truncated) {
+function buildPrompt(skill: DiscoveredSkill, content: string, truncated: boolean) {
   return [
     "You are a security auditor reviewing a local agent skill.",
     "Return ONLY valid JSON with this schema:",
@@ -129,7 +146,7 @@ function buildPrompt(skill, content, truncated) {
   ].join("\n");
 }
 
-function startSpinner(message) {
+function startSpinner(message: string) {
   const frames = ["|", "/", "-", "\\"];
   let index = 0;
   process.stdout.write(`${frames[index]} ${message}`);
@@ -144,14 +161,14 @@ function startSpinner(message) {
   };
 }
 
-function formatTimestamp(date) {
+function formatTimestamp(date: Date | null) {
   if (!date) {
     return "unknown";
   }
   return date.toISOString();
 }
 
-function hashSkillAudit(content, auditor) {
+function hashSkillAudit(content: string, auditor: string) {
   const promptVersion = "v1";
   const schemaVersion = "v1";
   return crypto
@@ -166,7 +183,7 @@ function hashSkillAudit(content, auditor) {
     .digest("hex");
 }
 
-async function ensureUserConfig(options, auditorStatus) {
+async function ensureUserConfig(options: ScanOptions, auditorStatus: ReturnType<typeof listAuditorStatus>) {
   if (await userConfigExists()) {
     return false;
   }
@@ -188,7 +205,7 @@ async function ensureUserConfig(options, auditorStatus) {
   return true;
 }
 
-async function runScan(scanPath, options = {}) {
+async function runScan(scanPath?: string, options: ScanOptions = {}) {
   banner();
   heading("SkillGuard Scan");
 
@@ -286,13 +303,13 @@ async function runScan(scanPath, options = {}) {
 
   success(`Found ${skills.length} skills`);
 
-  const auditResults = new Map();
-  const auditDetails = new Map();
-  const auditUpdatedAt = new Map();
+  const auditResults = new Map<string, string>();
+  const auditDetails = new Map<string, AuditDetails>();
+  const auditUpdatedAt = new Map<string, Date | null>();
   if (auditMessage.startsWith("ready")) {
     info(`Skill audit: running (${config.auditor}).`);
     const useCache = config.cache && config.cache.enabled && !options.force;
-    const cache = useCache ? await readCache() : { version: 1, entries: {} };
+    const cache: CacheState = useCache ? await readCache() : { version: 1, entries: {} };
     for (const skill of skills) {
       const stop = verbose ? () => {} : startSpinner(`Auditing ${skill.name}`);
       try {
@@ -419,6 +436,4 @@ async function runScan(scanPath, options = {}) {
   return exitCode;
 }
 
-module.exports = {
-  runScan
-};
+export { runScan };

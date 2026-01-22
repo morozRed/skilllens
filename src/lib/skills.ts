@@ -1,7 +1,19 @@
-const fs = require("fs/promises");
-const path = require("path");
+import * as fs from "node:fs/promises";
+import * as path from "node:path";
 
 const SKILL_FILENAMES = new Set(["SKILL.md", "skill.md"]);
+
+type DiscoverSkillsOptions = {
+  maxDepth?: number;
+  ignoreDirs?: string[];
+};
+
+type DiscoveredSkill = {
+  name: string;
+  path: string;
+  file: string;
+  root: string;
+};
 
 async function isDirectory(target) {
   try {
@@ -15,7 +27,10 @@ async function isDirectory(target) {
   }
 }
 
-async function discoverSkills(roots, options = {}) {
+async function discoverSkills(
+  roots: string[],
+  options: DiscoverSkillsOptions = {}
+): Promise<{ skills: DiscoveredSkill[]; missingRoots: string[] }> {
   const skills = [];
   const missingRoots = [];
   const maxDepth = Number.isInteger(options.maxDepth) ? options.maxDepth : 6;
@@ -76,6 +91,8 @@ async function discoverSkills(roots, options = {}) {
   return { skills, missingRoots };
 }
 
-module.exports = {
-  discoverSkills
+export {
+  discoverSkills,
+  type DiscoveredSkill,
+  type DiscoverSkillsOptions
 };

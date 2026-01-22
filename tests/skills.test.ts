@@ -1,7 +1,11 @@
-const test = require("node:test");
-const assert = require("node:assert/strict");
-const path = require("node:path");
-const { discoverSkills } = require("../src/lib/skills");
+import test from "node:test";
+import assert from "node:assert/strict";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { discoverSkills } from "../src/lib/skills.js";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 test("discoverSkills finds SKILL.md files", async () => {
   const fixturesRoot = path.join(__dirname, "fixtures", "skills");

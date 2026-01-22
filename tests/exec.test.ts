@@ -1,9 +1,9 @@
-const test = require("node:test");
-const assert = require("node:assert/strict");
-const fs = require("node:fs/promises");
-const path = require("node:path");
-const os = require("node:os");
-const { findExecutable } = require("../src/lib/exec");
+import test from "node:test";
+import assert from "node:assert/strict";
+import fs from "node:fs/promises";
+import path from "node:path";
+import os from "node:os";
+import { findExecutable } from "../src/lib/exec.js";
 
 test("findExecutable resolves binaries from PATH", async () => {
   const tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "skillguard-exec-"));

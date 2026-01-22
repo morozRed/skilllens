@@ -3,15 +3,15 @@
   "version": "0.1.0",
   "description": "CLI that scans local agent skills/tools and produces security reports.",
   "license": "MIT",
+  "type": "module",
   "bin": {
-    "skillguard": "bin/skillguard.js"
+    "skillguard": "dist/bin/skillguard.js"
   },
   "engines": {
     "node": ">=18"
   },
   "files": [
-    "bin/",
-    "src/",
+    "dist/",
     "README.md",
     "LICENSE"
   ],
@@ -22,12 +22,19 @@
     "skills"
   ],
   "scripts": {
-    "lint": "node --check bin/skillguard.js && node --check src/cli.js",
-    "smoke": "node bin/skillguard.js --help",
-    "test": "node --test"
+    "build": "tsc -p tsconfig.json",
+    "prepare": "pnpm run build",
+    "lint": "tsc -p tsconfig.json --noEmit",
+    "smoke": "pnpm run build && node dist/bin/skillguard.js --help",
+    "scan": "pnpm run build && node dist/bin/skillguard.js scan",
+    "test": "pnpm run build && node scripts/copy-fixtures.js && node --test dist/tests/*.js"
   },
   "dependencies": {
     "chalk": "^5.6.2",
     "commander": "^14.0.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.10",
+    "typescript": "^5.9.2"
   }
 }

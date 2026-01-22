@@ -1,5 +1,5 @@
-const { auditorCliCommand, AUDITOR_CLI } = require("./config");
-const { findExecutable } = require("./exec");
+import { auditorCliCommand, AUDITOR_CLI } from "./config.js";
+import { findExecutable } from "./exec.js";
 
 function resolveAuditorCli(auditor) {
   const command = auditorCliCommand(auditor);
@@ -43,7 +43,7 @@ function pickDefaultAuditor(statusList) {
   return "claude";
 }
 
-module.exports = {
+export {
   resolveAuditorCli,
   isAuditorAvailable,
   listAuditorStatus,

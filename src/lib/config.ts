@@ -1,7 +1,7 @@
-const os = require("os");
-const path = require("path");
-const { readJson, writeJson, fileExists } = require("./fs");
-const { userConfigPath } = require("./paths");
+import * as os from "node:os";
+import * as path from "node:path";
+import { readJson, writeJson, fileExists } from "./fs.js";
+import { userConfigPath } from "./paths.js";
 
 const AUDITOR_CLI = {
   claude: "claude",
@@ -99,7 +99,7 @@ async function userConfigExists() {
   return fileExists(userConfigPath());
 }
 
-module.exports = {
+export {
   auditorCliCommand,
   normalizeAuditor,
   defaultConfig,

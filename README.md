@@ -25,22 +25,19 @@ Run once:
 ```bash
 npx skillguard scan
 pnpm dlx skillguard scan
-bunx skillguard scan
 ```
 
 Install globally:
 
 ```bash
-npm i -g skillguard
 pnpm add -g skillguard
-bun add -g skillguard
 ```
 
 ## Usage
 
 ```bash
 skillguard scan
-skillguard scan [path] [--auditor claude|codex] /
+skillguard scan [path] [--auditor claude|codex]
 skillguard config
 ```
 

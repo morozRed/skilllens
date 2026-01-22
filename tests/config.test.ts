@@ -1,14 +1,14 @@
-const test = require("node:test");
-const assert = require("node:assert/strict");
-const {
+import test from "node:test";
+import assert from "node:assert/strict";
+import {
   defaultConfig,
   defaultScanRoots,
   mergeDeep,
   normalizeAuditor,
   auditorCliCommand
-} = require("../src/lib/config");
-const path = require("node:path");
-const os = require("node:os");
+} from "../src/lib/config.js";
+import path from "node:path";
+import os from "node:os";
 
 test("defaultConfig returns a fresh copy", () => {
   const first = defaultConfig();

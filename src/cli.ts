@@ -1,8 +1,15 @@
-const { Command } = require("commander");
-const pkg = require("../package.json");
-const { bannerText } = require("./lib/ui");
-const { runScan } = require("./commands/scan");
-const { runConfigShow } = require("./commands/config");
+import { Command } from "commander";
+import * as fs from "node:fs";
+import * as path from "node:path";
+import { fileURLToPath } from "node:url";
+import { bannerText } from "./lib/ui.js";
+import { runScan } from "./commands/scan.js";
+import { runConfigShow } from "./commands/config.js";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const pkgPath = path.resolve(__dirname, "../../package.json");
+const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf8"));
 
 function commandResult(promise) {
   return promise.then((code) => {
@@ -37,6 +44,4 @@ function main(argv = process.argv.slice(2)) {
   return program.parseAsync(argv, { from: "user" });
 }
 
-module.exports = {
-  main
-};
+export { main };

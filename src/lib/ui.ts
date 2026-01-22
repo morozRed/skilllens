@@ -1,4 +1,4 @@
-const chalk = require("chalk");
+import chalk from "chalk";
 
 function bannerText() {
   return [
@@ -80,7 +80,7 @@ function dim(message) {
   console.log(chalk.dim(message));
 }
 
-module.exports = {
+export {
   bannerText,
   banner,
   heading,

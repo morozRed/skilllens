@@ -1,7 +1,7 @@
-const { banner, heading, info } = require("../lib/ui");
-const { loadMergedConfig } = require("../lib/config");
-const { listAuditorStatus } = require("../lib/auditor");
-const { userConfigPath } = require("../lib/paths");
+import { banner, heading, info } from "../lib/ui.js";
+import { loadMergedConfig } from "../lib/config.js";
+import { listAuditorStatus } from "../lib/auditor.js";
+import { userConfigPath } from "../lib/paths.js";
 
 async function runConfigShow() {
   banner();
@@ -24,6 +24,4 @@ async function runConfigShow() {
   return 0;
 }
 
-module.exports = {
-  runConfigShow
-};
+export { runConfigShow };

@@ -1,0 +1,33 @@
+{
+  "name": "skillguard",
+  "version": "0.1.0",
+  "description": "CLI that scans local agent skills/tools and produces security reports.",
+  "license": "MIT",
+  "bin": {
+    "skillguard": "bin/skillguard.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "files": [
+    "bin/",
+    "src/",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "security",
+    "cli",
+    "audit",
+    "skills"
+  ],
+  "scripts": {
+    "lint": "node --check bin/skillguard.js && node --check src/cli.js",
+    "smoke": "node bin/skillguard.js --help",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "commander": "^11.1.0"
+  }
+}

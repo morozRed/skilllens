@@ -1,6 +1,6 @@
 {
   "name": "skilllens",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "CLI that scans local agent skills/tools and produces security reports.",
   "license": "MIT",
   "type": "module",

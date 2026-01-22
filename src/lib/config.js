@@ -6,7 +6,6 @@ const { userConfigPath } = require("./paths");
 const AUDITOR_CLI = {
   claude: "claude",
   codex: "codex",
-  opencode: "opencode"
 };
 
 const DEFAULT_AUDITOR = "claude";

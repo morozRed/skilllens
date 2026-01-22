@@ -39,12 +39,13 @@ bun add -g skillguard
 ## Usage
 
 ```bash
-skillguard scan [path] [--auditor claude|codex|opencode]
+skillguard scan
+skillguard scan [path] [--auditor claude|codex] /
 skillguard config
 ```
 
 `scan` uses `scan.autoRoots` from the config by default. Pass a path to scan a specific directory instead.
-Scan output includes auditor CLI availability for `claude`, `codex`, and `opencode`.
+Scan output includes auditor CLI availability for `claude` and `codex`
 
 ## First-run setup (scan)
 
@@ -76,7 +77,7 @@ Edit `auditor` or `scan.autoRoots` in the config file to change the CLI tool or 
 ## Notes
 
 - The v0.1 implementation focuses on packaging and scan output. Auditor calls and deep scanning are stubbed and will evolve.
-- SkillGuard uses auditor CLIs (no direct API calls). Install and login to `claude`, `codex`, or `opencode`.
+- SkillGuard uses auditor CLIs (no direct API calls). Install and login to `claude` or `codex`.
 - Missing auditor CLIs still produce scan results with audit status `skipped`.
 
 ## Development

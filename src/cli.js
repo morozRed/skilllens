@@ -24,7 +24,7 @@ function main(argv = process.argv.slice(2)) {
   program
     .command("scan [path]")
     .description("Scan configured skills paths (or provided path) and show findings.")
-    .option("--auditor <auditor>", "Select auditor: claude, codex, opencode")
+    .option("--auditor <auditor>", "Select auditor: claude, codex")
     .option("--verbose", "Show verbose audit output (disables spinner)")
     .option("--force", "Force re-audit (ignore cached results)")
     .action((path, options) => commandResult(runScan(path, options)));
